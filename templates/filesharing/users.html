@@ -1,0 +1,80 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Home</title>
+    <link rel="stylesheet" type="text/css" href={% static "css/styles.css" %}/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+</head>
+  <body>
+<div class="sidebar">
+  <a href="home1"><i class="fa fa-fw fa-home"></i> Home</a>
+  <a href="My_Files"><i class="fa fa-fw fa-file"></i>My files</a>
+  <a class="active" href="allusers"><i class="fa fa-fw fa-user"></i>All Users</a>
+  <a href="createdprofile"><i class="fa fa-fw fa-address-card"></i>MY Profile</a>
+  <a href="logout"><i class="fa fa-fw fa"></i>Logout</a>
+</div>
+
+
+ <script type="application/javascript"href="js/jquery-1.11.3.min.js">
+function myFunction(event) {
+    event.preventDefault();
+    var name=document.getElementById('name').innerHTML
+    $.ajax({
+        type: "GET",
+        url: '/ousersfile',
+        data: {
+            "result": name,
+        },
+        dataType: "json",
+        success: function (data) {
+            // any process in data
+            alert("successfull")
+        },
+        failure: function () {
+            alert("failure");
+        }
+    });
+
+
+}
+</script>
+
+  <div class="content">
+
+
+
+
+                {% for u in all_users %}
+                  {% if not u.pk is current_user.pk %}
+                      <article class="media content-section">
+<a href="{% url 'oprofile' u.username %}" class="list-group-item">
+
+    <img class="rounded-circle article-img" width="100" height = "100" src="{{ u.profile.image.url }}">
+                </a>
+
+
+                           <div class="media-body">
+            <div class="article-metadata">
+
+
+                      <a href="{% url 'filesharing:ousersfiles' u.username %}" class="list-group-item">
+                 <h4 class="list-group-item-heading" id="name" >{{ u.username }}</h4>
+                  <p class="list-group-item-text">{{ u.email }}</p>
+
+
+                 </a>
+
+
+          </div>
+          </div>
+        </article>
+ {% endif %}
+      {% endfor %}
+
+
+  </body>
+</html>

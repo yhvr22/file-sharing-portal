@@ -1,0 +1,248 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+  <head>
+    <meta charset="utf-8">
+    <title>Home</title>
+    <link rel="stylesheet" type="text/css" href="{%  static "css/styles.css" %}"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+ <style>
+      .dropbtn {
+       margin-left: 1350px;
+  background-color: #5897fb ;
+  color: white;
+          width: 150px;
+  padding-bottom: 15px;
+  font-size: 20px;
+          text-align:center;
+  border: none;
+}
+      .dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-content {
+    margin-left: 1350px;
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+.dropdown-content a:hover {background-color: #ddd;}
+.dropdown:hover .dropdown-content {display: block;}
+.dropdown:hover .dropbtn {background-color: #3e8e41;}
+
+
+
+     </style>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  </head>
+
+</head>
+  <body>
+
+
+
+<div class="sidebar">
+  <a href="{% url 'filesharing:home1' %}"><i class="fa fa-fw fa-home"></i> Home</a>
+  <a  class="active" href="{% url 'filesharing:My_Files' %}"><i class="fa fa-fw fa-file"></i>My files</a>
+  <a  href="{% url 'filesharing:allusers' %}"><i class="fa fa-fw fa-user"></i>All Users</a>
+  <a href="{% url 'createdprofile' %}"><i class="fa fa-fw fa-address-card"></i>MY Profile</a>
+  <a href="{% url 'logout' %}"><i class="fa fa-fw fa"></i>Logout</a>
+</div>
+<div class="dropdown">
+  <button class="dropbtn">Edit </button>
+  <div class="dropdown-content">
+    <a href="{% url 'filesharing:linked-folder-add' folder_id %}">create folder</a><br>
+    <a href="{% url 'filesharing:folder-upload' active_folder.id %}">Upload folder</a><br>
+
+    <a id="button1" type="submit">Add File</a>
+
+
+  </div>
+</div>
+
+
+
+<script>
+
+    var dropdown = document.getElementsByClassName("dropbtn");
+var i;
+
+for (i = 0; i < dropdown.length; i++) {
+  dropdown[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var dropdownContent = this.nextElementSibling;
+    if (dropdownContent.style.display === "block") {
+      dropdownContent.style.display = "none";
+    } else {
+      dropdownContent.style.display = "block";
+    }
+  });
+}
+
+
+
+</script>
+
+<div class="content">
+ <ol class="breadcrumb">
+  <li class="breadcrumb-item"> <a href="{% url 'filesharing:My_Files' %}"> {{ user.username }} </a> </li>
+  {% for parent in parent_list %}
+    {% if parent is not active_folder %}
+      <li class="breadcrumb-item"> <a href="{% url 'filesharing:user-linked-files' parent.id %}"> {{ parent }}</a> </li>
+    {% else %}
+    <li class="breadcrumb-item active" aria-current="page"><a href="{% url 'filesharing:user-linked-files' parent.id %}" style="color:black"> {{ parent }}</a></li>
+    {% endif %}
+  {% endfor %}
+</ol>
+
+  {%  if notfav or files  %}
+  <h2> Files</h2>
+  {% endif %}
+<div class="list-group">
+     </div>
+{% for file in notfav %}
+        <div class="list-group">
+             <div class="list-group-item">
+                 <h4 class="list-group-item-text">{{ file.name}}</h4>
+                  <p class="list-group-item-text">{{ file.created_on}}</p>
+                <td> <a class="list-group-item-text" href="{{ file.file.url }}" target="_blank"><button type="button" class="btn btn-primary">Preview</button> </a> </td>
+
+                 <a class="list-group-item-text" href="{{ file.file.url }}" target="_blank" download><button type="button" class="btn btn-primary">Download</button></a>
+               <a class="list-group-item-text" href="{% url 'filesharing:delete' file.pk %}" ><button type="button" class="btn btn-primary">Delete</button></a>
+                 <a class="list-group-item-text" href="{% url 'filesharing:starredfile' file.pk  %}" ><button type="button" class="btn btn-primary">Add to Favourites</button></a>
+
+                 {% if file.isprivate %}
+                    <a class="list-group-item-text" href="{% url 'filesharing:makepublic' file.pk %}" ><button type="button" class="btn btn-primary">Make Public</button></a>
+
+                 {% else %}
+                     <a class="list-group-item-text" href="{% url 'filesharing:makeprivate' file.pk %}" ><button type="button" class="btn btn-primary">Make Private</button></a>
+                  {% endif %}
+
+             </div>
+        </div>
+ {% endfor %}
+
+
+
+
+<div class="list-group">
+      {% for file in files %}
+            <div class="list-group">
+                 <div class="list-group-item">
+                     <h4 class="list-group-item-text">{{ file.name}}</h4>
+                      <p class="list-group-item-text">{{ file.created_on}}</p>
+                      <a class="list-group-item-text" href="{{ file.file.url }}" target="_blank"><button type="button" class="btn btn-primary">Preview</button> </a> </td>
+                      <a class="list-group-item-text" href="{{ file.file.url }}" target="_blank" download><button type="button" class="btn btn-primary">Download</button></a>
+                      <a class="list-group-item-text" href="{% url 'filesharing:delete' file.pk %}" ><button type="button" class="btn btn-primary">Delete</button></a>
+
+                           <a class="list-group-item-text" href="{% url 'filesharing:removestay' file.pk %}" ><button type="button" class="btn btn-primary">Remove From Favourites</button></a>
+
+                     {% if file.isprivate %}
+                        <a class="list-group-item-text" href="{% url 'filesharing:makepublic' file.pk %}" ><button type="button" class="btn btn-primary">Make Public</button></a>
+                      {% else %}
+                         <a class="list-group-item-text" href="{% url 'filesharing:makeprivate' file.pk %}" ><button type="button" class="btn btn-primary">Make Private</button></a>
+                      {% endif %}
+                </div>
+            </div>
+      {% endfor %}
+    </div>
+
+<div class="list-group">
+ {% if folders or notfavfolders %}
+ <h2> Folders</h2>
+{% endif %}
+
+{% for f in folders %}
+        <div class="list-group">
+             <div class="list-group-item">
+                   <i class="material-icons"  style="color: orange" >
+              folder
+                 </i>
+                 <a style="font-size:25px;color:black"  href="{% url 'filesharing:user-linked-files' f.id %}" > {{ f }} </a> <br>
+                 <p>  </p>
+                   <a  class="list-group-item-text" href="{% url 'filesharing:folder-delete' f.id %}" ><button type="button" class="btn btn-primary">Delete</button></a>
+                       <a class="list-group-item-text" href="{% url 'filesharing:download_folder' f.id %}" target="_blank" download><button type="button" class="btn btn-primary">Download</button></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <a class="list-group-item-text" href="{% url 'filesharing:removestayfolder' f.id %}" ><button type="button" class="btn btn-primary">Remove From Favourites</button></a>
+
+
+
+          </div>
+        </div>
+ {% endfor %}
+
+{% for f in notfavfolders %}
+        <div class="list-group">
+             <div class="list-group-item">
+                   <i class="material-icons"  style="color: orange" >
+              folder
+                 </i>
+ <a style="font-size:25px;color:black"  href="{% url 'filesharing:user-linked-files' f.id %}" > {{ f }} </a> <br>
+                 <p>  </p>                   <a  href="{% url 'filesharing:folder-delete' f.id %}" ><button type="button" class="btn btn-primary">Delete</button></a>
+                       <a class="list-group-item-text" href="{% url 'filesharing:download_folder' f.id %}" target="_blank" download><button type="button" class="btn btn-primary">Download</button></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                 <a class="list-group-item-text" href="{% url 'filesharing:starredfolder' f.id %}" ><button type="button" class="btn btn-primary"> Add to  Favourites</button></a>
+
+
+
+          </div>
+        </div>
+ {% endfor %}
+
+ </div>
+
+
+
+
+
+
+   <script>
+     var el= document.getElementById('button1')
+         if(el)
+         {
+             el.addEventListener('click',function(){
+             document.querySelector('.bg-modal').style.display='flex';
+            });
+
+         }
+   </script>
+
+
+
+  <div class="bg-modal">
+    <div class="modal-content">
+        <div class="close">+</div>
+           <form action='uploadlinkedfile' method="POST"  enctype="multipart/form-data">
+             {% csrf_token %}
+               <input type="file" name="file" >
+             <button type="submit">Upload</button>
+           </form>
+
+
+    </div>
+  </div>
+  <script>
+      var el = document.querySelector('.close')
+         if(el) {
+             el.addEventListener('click', function () {
+                 document.querySelector('.bg-modal').style.display = 'none';
+             });
+
+         }
+  </script>
+</div>
+  </body>
+</html>
+
